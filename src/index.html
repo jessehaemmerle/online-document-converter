@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; worker-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <title>Office-Konverter – alte Office-Dateien sicher umwandeln</title>
+  <meta name="description" content="Wandelt .doc, .xls, .ppt und andere alte Office-Dateien direkt im Browser in .docx, .xlsx und .pptx um. Kein Upload, kein Tracking.">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/style.css">
+  <script type="module" src="assets/app.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./">
+        <img src="assets/icon.svg" alt="" width="28" height="28">
+        <span data-i18n="appName">Office-Konverter</span>
+      </a>
+      <div class="lang-switch" role="group" data-i18n-aria-label="languageLabel" aria-label="Sprache">
+        <button type="button" data-lang="de" lang="de">DE</button>
+        <button type="button" data-lang="en" lang="en">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <h1 data-i18n="headline">Alte Office-Dateien in aktuelle Formate umwandeln</h1>
+      <p class="lead" data-i18n="lead">Aus .doc, .xls, .ppt &amp; Co. werden .docx, .xlsx und .pptx – direkt in Ihrem Browser. Ihre Dateien verlassen dabei nie Ihr Gerät.</p>
+      <ul class="badges">
+        <li data-i18n="badgeNoUpload">Kein Upload</li>
+        <li data-i18n="badgeNoTracking">Kein Tracking</li>
+        <li data-i18n="badgeNoCookies">Keine Cookies</li>
+        <li data-i18n="badgeOpenSource">Open Source</li>
+      </ul>
+    </section>
+
+    <noscript><p class="notice notice-error">Der Konverter benötigt JavaScript. / The converter requires JavaScript.</p></noscript>
+    <div id="fatal" class="notice notice-error" role="alert" hidden></div>
+
+    <section id="dropzone" class="dropzone">
+      <input id="file-input" type="file" multiple hidden>
+      <svg class="drop-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <p class="drop-title"><strong data-i18n="dropTitle">Dateien hierher ziehen</strong> <span data-i18n="dropOr">oder</span></p>
+      <button id="choose-files" type="button" class="button button-primary" data-i18n="dropChoose">Dateien auswählen</button>
+      <p class="drop-formats" data-i18n="dropFormats"></p>
+      <p id="first-load-hint" class="drop-hint" hidden></p>
+    </section>
+
+    <section id="engine-status" class="engine" aria-live="polite" hidden>
+      <p id="engine-text" class="engine-text"></p>
+      <progress id="engine-progress" max="100"></progress>
+    </section>
+
+    <section id="files" class="files" hidden>
+      <div class="files-head">
+        <h2 data-i18n="filesHeading">Dateien</h2>
+        <div class="files-actions">
+          <button id="download-all" type="button" class="button button-primary" data-i18n="downloadAll" disabled>Alle als ZIP herunterladen</button>
+          <button id="clear-list" type="button" class="button" data-i18n="clearList">Liste leeren</button>
+        </div>
+      </div>
+      <ul id="file-list" class="file-list" aria-live="polite"></ul>
+    </section>
+
+    <section class="privacy">
+      <h2 data-i18n="privacyHeading">So schützt der Konverter Ihre Daten</h2>
+      <ul class="privacy-list">
+        <li><strong data-i18n="privacyLocalTitle"></strong> <span data-i18n="privacyLocalText"></span></li>
+        <li><strong data-i18n="privacyNoStorageTitle"></strong> <span data-i18n="privacyNoStorageText"></span></li>
+        <li><strong data-i18n="privacyNoTrackingTitle"></strong> <span data-i18n="privacyNoTrackingText"></span></li>
+        <li><strong data-i18n="privacyCacheTitle"></strong> <span data-i18n="privacyCacheText"></span></li>
+        <li><strong data-i18n="privacyHostingTitle"></strong> <span data-i18n="privacyHostingText"></span></li>
+      </ul>
+      <details class="tech">
+        <summary data-i18n="techHeading">Technische Details</summary>
+        <p id="tech-text"></p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <a href="https://github.com/jessehaemmerle/online-document-converter" rel="noopener noreferrer" data-i18n="footerSource">Quellcode (GPL-3.0)</a>
+      <a href="https://www.libreoffice.org/about-us/licenses/" rel="noopener noreferrer" data-i18n="footerEngine">Engine: LibreOffice (MPL-2.0)</a>
+      <button id="clear-cache" type="button" class="link-button" data-i18n="clearCache">Gespeicherte Programmdateien löschen</button>
+      <span id="cache-status" role="status"></span>
+    </div>
+  </footer>
+
+  <template id="file-template">
+    <li class="file">
+      <div class="file-icon" aria-hidden="true"></div>
+      <div class="file-body">
+        <p class="file-name"><span class="file-source"></span> <span class="file-arrow" aria-hidden="true">→</span> <span class="file-target"></span></p>
+        <p class="file-status"></p>
+        <p class="file-note" hidden></p>
+        <div class="macro-choice" hidden>
+          <p class="macro-title"></p>
+          <div class="macro-options">
+            <button type="button" class="button button-primary macro-remove"></button>
+            <button type="button" class="button macro-keep"></button>
+          </div>
+          <p class="macro-remove-hint"></p>
+          <p class="macro-keep-hint"></p>
+        </div>
+      </div>
+      <div class="file-actions">
+        <a class="button button-primary file-download" hidden></a>
+        <button type="button" class="button file-retry" hidden></button>
+        <button type="button" class="icon-button file-remove"><span aria-hidden="true">×</span></button>
+      </div>
+    </li>
+  </template>
+</body>
+</html>
