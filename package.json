@@ -1,0 +1,23 @@
+{
+  "name": "online-document-converter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Wandelt alte Office-Dateien (.doc, .xls, .ppt …) direkt im Browser in aktuelle Formate um – ohne Upload, ohne Tracking.",
+  "license": "GPL-3.0-only",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "serve": "node scripts/serve.mjs",
+    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "test:e2e": "node --test --test-concurrency=1 \"tests/e2e/*.test.mjs\""
+  },
+  "dependencies": {
+    "@matbee/libreoffice-converter": "2.7.2"
+  },
+  "devDependencies": {
+    "playwright-core": "1.56.1"
+  }
+}
